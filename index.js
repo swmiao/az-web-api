@@ -5,10 +5,10 @@ const config = require('./config');
 const BearerStrategy = require('passport-azure-ad').BearerStrategy;
 
 // A simple check for clientID placeholder
-if (config.clientID === 'YOUR_CLIENT_ID') {
-    console.error("Please update 'options' with the client id (application id) of your application");
-    return;
-}
+// if (config.clientID === 'YOUR_CLIENT_ID') {
+//     console.error("Please update 'options' with the client id (application id) of your application");
+//     return;
+// }
 
 const bearerStrategy = new BearerStrategy(config,
     function (token, done) {
@@ -32,13 +32,13 @@ app.use((req, res, next) => {
 });
 
 // API endpoint
-app.get("/hello",
+app.get("/api",
     passport.authenticate('oauth-bearer', {session: false}),
     (req, res) => {
         console.log('User info: ', req.user);
         console.log('Validated claims: ', req.authInfo);
-        
-        if ('scp' in req.authInfo && req.authInfo['scp'].split(" ").indexOf("demo.read") >= 0) {
+        console.log(req);
+        if ('scp' in req.authInfo && req.authInfo['scp'].split(" ").indexOf("read") >= 0) {
             // Service relies on the name claim.  
             res.status(200).json({'name': req.authInfo['name']});
         } else {
@@ -47,6 +47,10 @@ app.get("/hello",
         }
     }
 );
+
+app.get("/hello", (req, res) => {
+    res.send('Hello World');
+})
 
 const port = process.env.PORT || 5000;
 
